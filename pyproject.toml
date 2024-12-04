@@ -1,0 +1,51 @@
+[tool.pylint.message_control]
+disable=['missing-module-docstring', 'missing-function-docstring', 'missing-class-docstring', 'too-few-public-methods', 'fixme', 'unused-argument']
+extension-pkg-whitelist = "pydantic, lxml"
+min-similarity-lines=6
+
+[tool.pylint.format]
+max-line-length=100
+extension-pkg-whitelist=["dependency_injector", "pydantic"]
+
+[tool.pylint.basic]
+argument-rgx='[a-z0-9_]{2,30}$'
+variable-rgx='[a-zA-Z0-9_]{2,30}$'
+good-names=['i', 'j', 'k', 'v', 'ex', 'Run', '_']
+
+[tool.pylint.design]
+max-args=9
+max-locals=20
+max-parents=9
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+ignore_missing_imports = true
+strict = true
+warn_return_any = false
+disallow_untyped_calls = false
+disallow_subclassing_any = false
+plugins = ["pydantic.mypy"]
+exclude = ["migrations/"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+
+[[tool.mypy.overrides]]
+module = "src.main"
+disallow_untyped_decorators = false
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+[tool.bandit]
+skips=["B405", "B324", "B410", "B314", "B320"]
+
+[tool.bandit.assert_used]
+skips=["*_test.py", "*test_*.py"]
+
+[tool.pytest.ini_options]
+log_cli = true
