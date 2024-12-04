@@ -1,26 +1,17 @@
-version: '3.8'
-
 services:
   keycloak_db:
     image: postgres:14
-    environment:
-      POSTGRES_DB: keycloak_db
-      POSTGRES_USER: keycloak_user
-      POSTGRES_PASSWORD: keycloak_password
+    env_file:
+      - ./.env
     volumes:
       - ./postgres-keycloak-data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
   keycloak:
     image: quay.io/keycloak/keycloak:21.1
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://keycloak_db:5432/keycloak_db
-      KC_DB_USERNAME: keycloak_user
-      KC_DB_PASSWORD: keycloak_password
-    command: 
+    env_file:
+      - ./.env
+    command:
       - start-dev
       - --import-realm
     volumes:
@@ -35,8 +26,17 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    environment:
-      REACT_APP_API_URL: http://localhost:8000
-      REACT_APP_KEYCLOAK_URL: http://localhost:8080
-      REACT_APP_KEYCLOAK_REALM: reports-realm
-      REACT_APP_KEYCLOAK_CLIENT_ID: reports-frontend
+    env_file:
+      - ./.env
+  app:
+    build:
+      context: .
+      dockerfile: ./api/container/Dockerfile
+    env_file:
+      - ./.env
+    entrypoint: >
+      sh -c "python /home/pyworker/app/src/main.py"
+    volumes:
+      - ./api:/home/pyworker/app:z
+    ports:
+      - "8000:8000"
